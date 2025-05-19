@@ -8,8 +8,6 @@ pipeline {
     environment {
         AWS_ACCESS_KEY_ID     = credentials('AWS_ACCESS_KEY_ID')
         AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
-        // Safely append homebrew path for Terraform if needed
-        PATH+TERRAFORM = "/opt/homebrew/bin"
     }
 
     stages {
@@ -25,9 +23,11 @@ pipeline {
         stage('Terraform Init & Plan') {
             steps {
                 dir('terraform') {
-                    sh 'terraform init'
-                    sh 'terraform plan -out=tfplan'
-                    sh 'terraform show -no-color tfplan > tfplan.txt'
+                    withEnv(['PATH=/opt/homebrew/bin:$PATH']) {
+                        sh 'terraform init'
+                        sh 'terraform plan -out=tfplan'
+                        sh 'terraform show -no-color tfplan > tfplan.txt'
+                    }
                 }
             }
         }
@@ -50,7 +50,9 @@ pipeline {
         stage('Terraform Apply') {
             steps {
                 dir('terraform') {
-                    sh 'terraform apply -input=false tfplan'
+                    withEnv(['PATH=/opt/homebrew/bin:$PATH']) {
+                        sh 'terraform apply -input=false tfplan'
+                    }
                 }
             }
         }
