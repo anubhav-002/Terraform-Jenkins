@@ -23,7 +23,7 @@ pipeline {
         stage('Terraform Init & Plan') {
             steps {
                 dir('terraform') {
-                    withEnv(['PATH=/opt/homebrew/bin:$PATH']) {
+                    withEnv(['PATH+TERRAFORM=/opt/homebrew/bin']) {
                         sh 'terraform init'
                         sh 'terraform plan -out=tfplan'
                         sh 'terraform show -no-color tfplan > tfplan.txt'
@@ -50,7 +50,7 @@ pipeline {
         stage('Terraform Apply') {
             steps {
                 dir('terraform') {
-                    withEnv(['PATH=/opt/homebrew/bin:$PATH']) {
+                    withEnv(['PATH+TERRAFORM=/opt/homebrew/bin']) {
                         sh 'terraform apply -input=false tfplan'
                     }
                 }
